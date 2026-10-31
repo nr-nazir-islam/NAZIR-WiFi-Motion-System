@@ -46,7 +46,7 @@ jobs:
           gradle-version: '8.7'
 
       - name: Build Android TV APK
-        working-directory: AndroidTV
+        working-directory: NAZIR-WiFi-Motion-System/AndroidTV
         run: gradle assembleDebug
 
       - name: Setup .NET
@@ -56,7 +56,7 @@ jobs:
 
       - name: Build Windows Receiver
         run: |
-          dotnet publish WindowsReceiver/WindowsReceiver.csproj \
+          dotnet publish NAZIR-WiFi-Motion-System/WindowsReceiver/WindowsReceiver.csproj \
             -c Release \
             -r win-x64 \
             --self-contained true \
@@ -66,7 +66,7 @@ jobs:
       - name: Package Build Files
         run: |
           mkdir -p out
-          cp AndroidTV/app/build/outputs/apk/debug/app-debug.apk out/NAZIR-WiFi-TV.apk
+          cp NAZIR-WiFi-Motion-System/AndroidTV/app/build/outputs/apk/debug/app-debug.apk out/NAZIR-WiFi-TV.apk
           cd out
           zip -r WindowsReceiver-win-x64.zip windows
 
