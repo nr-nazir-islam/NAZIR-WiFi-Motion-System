@@ -1,0 +1,61 @@
+
+name: Build NAZIR Wi-Fi Motion Lab
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Build Android TV APK
+        working-directory: AndroidTV
+        run: gradle assembleDebug
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build Windows Receiver
+        run: |
+          dotnet publish WindowsReceiver/WindowsReceiver.csproj \
+            -c Release \
+            -r win-x64 \
+            --self-contained true \
+            -p:PublishSingleFile=true \
+            -o out/windows
+
+      - name: Package Build Files
+        run: |
+          mkdir -p out
+          cp AndroidTV/app/build/outputs/apk/debug/app-debug.apk out/NAZIR-WiFi-TV.apk
+          cd out
+          zip -r WindowsReceiver-win-x64.zip windows
+
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nazir-wifi-motion-builds
+          path: out/*
